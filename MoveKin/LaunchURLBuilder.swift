@@ -9,7 +9,7 @@ import Foundation
 
 class LaunchURLBuilder {
     static func requestAddressURL(for app: MoveKinApp) -> URL? {
-        guard app.urlScheme.isNotEmpty else {
+        guard !app.urlScheme.isEmpty else {
             return nil
         }
 
