@@ -17,8 +17,10 @@ struct GetAddressFlowTypes {
     enum Error: Swift.Error {
         case invalidURLScheme
         case appLaunchFailed(MoveKinApp)
+        case noAccount
         case bundleIdMismatch
         case invalidHandleURL
+        case invalidLaunchParameters
         case invalidAddress
         case timeout
     }

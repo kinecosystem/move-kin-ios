@@ -23,40 +23,55 @@ class LaunchURLBuilder {
             fatalError(message)
         }
 
-        var urlComponents = URLComponents()
-        urlComponents.scheme = app.urlScheme
-        urlComponents.host = Constants.urlHost
-        urlComponents.path = Constants.requestAddressURLPath
-        urlComponents.queryItems = [URLQueryItem(name: Constants.callerAppNameQueryItem, value: Bundle.appName),
-                                    URLQueryItem(name: Constants.callerAppURLSchemeQueryItem, value: appURLScheme)]
+        var components = URLComponents.moveKin(scheme: app.urlScheme, path: Constants.requestAddressURLPath)
+        components.queryItems = [URLQueryItem(name: Constants.callerAppNameQueryItem, value: Bundle.appName),
+                                 URLQueryItem(name: Constants.callerAppURLSchemeQueryItem, value: appURLScheme)]
 
-        return urlComponents.url
+        return components.url
     }
 
     static func provideAddressURL(address: String, urlScheme: String) -> URL {
-        var urlComponents = URLComponents()
-        urlComponents.scheme = urlScheme
-        urlComponents.host = Constants.urlHost
-        urlComponents.path = Constants.receiveAddressURLPath
-        urlComponents.queryItems = [URLQueryItem(name: Constants.receiveAddressQueryItem, value: address)]
+        var components = URLComponents.moveKin(scheme: urlScheme, path: Constants.receiveAddressURLPath)
+        components.queryItems = [URLQueryItem(name: Constants.receiveAddressQueryItem,
+                                              value: address),
+                                 URLQueryItem(name: Constants.receiveAddressStatusQueryItem,
+                                              value: Constants.receiveAddressStatusOk)]
+
+        return components.url!
+    }
+
+    static func provideAddressCancelledURL(urlScheme: String) -> URL {
+        var urlComponents = URLComponents.moveKin(scheme: urlScheme, path: Constants.receiveAddressURLPath)
+        urlComponents.queryItems = [URLQueryItem(name: Constants.receiveAddressStatusQueryItem,
+                                                 value: Constants.receiveAddressStatusCancelled)]
+
+        return urlComponents.url!
+    }
+
+    static func provideAddressInvalidURL(urlScheme: String) -> URL {
+        var urlComponents = URLComponents.moveKin(scheme: urlScheme, path: Constants.receiveAddressURLPath)
+        urlComponents.queryItems = [URLQueryItem(name: Constants.receiveAddressStatusQueryItem,
+                                                 value: Constants.receiveAddressStatusInvalid)]
+
+        return urlComponents.url!
+    }
+
+    static func provideAddressNoAccount(urlScheme: String) -> URL {
+        var urlComponents = URLComponents.moveKin(scheme: urlScheme, path: Constants.receiveAddressURLPath)
+        urlComponents.queryItems = [URLQueryItem(name: Constants.receiveAddressStatusQueryItem,
+                                                 value: Constants.receiveAddressStatusNoAccount)]
 
         return urlComponents.url!
     }
 }
 
-private extension Bundle {
-    static var appName: String? {
-        return main.infoDictionary?["CFBundleDisplayName"] as? String
-            ?? main.infoDictionary?["CFBundleName"] as? String
-    }
+private extension URLComponents {
+    static func moveKin(scheme: String, path: String) -> URLComponents {
+        var components = URLComponents()
+        components.scheme = scheme
+        components.host = Constants.urlHost
+        components.path = path
 
-    static var firstAppURLScheme: String? {
-        guard let urlTypes = Bundle.main.infoDictionary?["CFBundleURLTypes"] as? [AnyObject],
-            let urlTypesDictionary = urlTypes.first as? [String: AnyObject],
-            let urlSchemes = urlTypesDictionary["CFBundleURLSchemes"] as? [String] else {
-                return nil
-        }
-
-        return urlSchemes.first
+        return components
     }
 }

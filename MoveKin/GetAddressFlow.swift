@@ -78,38 +78,64 @@ class GetAddressFlow {
             return
         }
 
-        //TODO: uncomment
-//        guard bundleId == appBundleId else {
-//            state = .error(.bundleIdMismatch)
-//            return
-//        }
+        guard bundleId == appBundleId else {
+            state = .error(.bundleIdMismatch)
+            return
+        }
 
         do {
-            let address = try kinAddress(from: url)
+            let statusAndAddress = try extractQueryItems(from: url)
+            let status = statusAndAddress.status
+
+            guard status == Constants.receiveAddressStatusOk else {
+                setState(for: status)
+                return
+            }
+
+            let address = try validateKinAddress(from: statusAndAddress.address)
             state = .success(address)
         } catch let error as GetAddressFlowTypes.Error {
             state = .error(error)
         } catch { }
     }
 
-    private func kinAddress(from url: URL) throws -> PublicAddress {
+    private func setState(for invalidStatus: String) {
+        switch invalidStatus {
+        case Constants.receiveAddressStatusNoAccount: state = .error(.noAccount)
+        case Constants.receiveAddressStatusCancelled: state = .cancelled
+        case Constants.receiveAddressStatusInvalid: state = .error(.invalidLaunchParameters)
+        default: state = .error(.invalidLaunchParameters)
+        }
+    }
+
+    private func extractQueryItems(from url: URL) throws -> (status: String, address: String) {
         guard canHandleURL(url),
             let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false),
             let queryItems = urlComponents.queryItems,
+            let statusQueryItem = queryItems.first(where: {
+                $0.name == Constants.receiveAddressStatusQueryItem
+            }),
+            let status = statusQueryItem.value,
             let addressQueryItem = queryItems.first(where: {
                 $0.name == Constants.receiveAddressQueryItem
             }) else {
                 throw GetAddressFlowTypes.Error.invalidHandleURL
         }
 
-        guard
-            let sAddress = addressQueryItem.value,
-            let pAddress = PublicAddress(rawValue: sAddress),
-            sAddress == pAddress.asString else {
+        guard let addressString = addressQueryItem.value else {
             throw GetAddressFlowTypes.Error.invalidAddress
         }
 
-        return pAddress
+        return (status, addressString)
+    }
+
+    private func validateKinAddress(from addressString: String) throws -> PublicAddress {
+        guard let publicAddress = PublicAddress(rawValue: addressString),
+            addressString == publicAddress.asString else {
+            throw GetAddressFlowTypes.Error.invalidAddress
+        }
+
+        return publicAddress
     }
 
     @objc func appDidBecomeActive() {

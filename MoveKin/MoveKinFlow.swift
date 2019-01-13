@@ -173,7 +173,7 @@ public class MoveKinFlow {
         case Constants.receiveAddressURLPath:
             getAddressFlow.handleURL(url, from: appBundleId)
         case Constants.requestAddressURLPath:
-            print("YO")
+            provideAddressFlow.handleURL(url, from: appBundleId, delegate: delegate)
         default:
             break
         }
@@ -181,10 +181,8 @@ public class MoveKinFlow {
 }
 
 // MARK: - Success Handling
-extension MoveKinFlow {
+fileprivate extension MoveKinFlow {
     func getAddressFlowDidSucceed(with publicAddress: PublicAddress) {
-        print("Got public address: \(publicAddress.asString)")
-
         // Network requests fail when the app didn't finish to transition to foreground.
         // Also, for a better transition, delay the calls below by 0.5s
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
@@ -212,7 +210,9 @@ extension MoveKinFlow {
             navigationController?.dismiss(animated: true, completion: nil)
         case .appLaunchFailed(let app):
             handleOpenAppStore(for: app)
-        case .bundleIdMismatch, .invalidAddress, .invalidHandleURL, .invalidURLScheme:
+        case .noAccount:
+            getAddressFlowNoAccount()
+        case .bundleIdMismatch, .invalidAddress, .invalidHandleURL, .invalidURLScheme, .invalidLaunchParameters:
             displayGeneralErrorAlert()
         }
     }
@@ -226,6 +226,11 @@ extension MoveKinFlow {
             self.navigationController?.dismiss(animated: true)
         })
         navigationController?.present(alertController, animated: true)
+    }
+
+    private func getAddressFlowNoAccount() {
+        //TODO: add alert
+        navigationController?.dismiss(animated: true)
     }
 
     private func handleOpenAppStore(for destinationApp: MoveKinApp) {

@@ -19,6 +19,10 @@
 		9191EC3321E7874F002BAC48 /* MoveKinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9191EC2A21E7874E002BAC48 /* MoveKinApp.swift */; };
 		9191EC3421E7874F002BAC48 /* MoveKinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9191EC2B21E7874E002BAC48 /* MoveKinFlow.swift */; };
 		9191EC3521E7874F002BAC48 /* PublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9191EC2C21E7874E002BAC48 /* PublicKey.swift */; };
+		9191EC5C21E78AEF002BAC48 /* StellarKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9191EC5B21E78AEF002BAC48 /* StellarKit.framework */; };
+		91D4908921EB7763003DD7A2 /* AcceptMoveKinViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D4908821EB7763003DD7A2 /* AcceptMoveKinViewController.swift */; };
+		91D4908B21EB77A5003DD7A2 /* MoveKin.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 91D4908A21EB77A5003DD7A2 /* MoveKin.xcassets */; };
+		91D4908D21EB78DE003DD7A2 /* Bundle+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D4908C21EB78DE003DD7A2 /* Bundle+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +51,10 @@
 		9191EC2A21E7874E002BAC48 /* MoveKinApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveKinApp.swift; sourceTree = "<group>"; };
 		9191EC2B21E7874E002BAC48 /* MoveKinFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveKinFlow.swift; sourceTree = "<group>"; };
 		9191EC2C21E7874E002BAC48 /* PublicKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PublicKey.swift; sourceTree = "<group>"; };
+		9191EC5B21E78AEF002BAC48 /* StellarKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = StellarKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		91D4908821EB7763003DD7A2 /* AcceptMoveKinViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcceptMoveKinViewController.swift; sourceTree = "<group>"; };
+		91D4908A21EB77A5003DD7A2 /* MoveKin.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = MoveKin.xcassets; sourceTree = "<group>"; };
+		91D4908C21EB78DE003DD7A2 /* Bundle+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9191EC5C21E78AEF002BAC48 /* StellarKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +83,7 @@
 				9191EC0C21E78731002BAC48 /* MoveKin */,
 				9191EC1721E78731002BAC48 /* MoveKinTests */,
 				9191EC0B21E78731002BAC48 /* Products */,
+				9191EC5A21E78AEF002BAC48 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -89,14 +99,17 @@
 		9191EC0C21E78731002BAC48 /* MoveKin */ = {
 			isa = PBXGroup;
 			children = (
+				91D4908A21EB77A5003DD7A2 /* MoveKin.xcassets */,
+				9191EC2B21E7874E002BAC48 /* MoveKinFlow.swift */,
+				91D4908C21EB78DE003DD7A2 /* Bundle+Extensions.swift */,
 				9191EC2521E7874E002BAC48 /* GetAddressFlow.swift */,
+				9191EC2421E7874E002BAC48 /* ProvideAddressFlow.swift */,
 				9191EC2921E7874E002BAC48 /* GetAddressFlowTypes.swift */,
 				9191EC2821E7874E002BAC48 /* LaunchURLBuilder.swift */,
 				9191EC2A21E7874E002BAC48 /* MoveKinApp.swift */,
 				9191EC2721E7874E002BAC48 /* MoveKinConstants.swift */,
-				9191EC2B21E7874E002BAC48 /* MoveKinFlow.swift */,
 				9191EC2621E7874E002BAC48 /* MoveKinNavigationController.swift */,
-				9191EC2421E7874E002BAC48 /* ProvideAddressFlow.swift */,
+				91D4908821EB7763003DD7A2 /* AcceptMoveKinViewController.swift */,
 				9191EC2C21E7874E002BAC48 /* PublicKey.swift */,
 				9191EC0D21E78731002BAC48 /* MoveKin.h */,
 				9191EC0E21E78731002BAC48 /* Info.plist */,
@@ -111,6 +124,14 @@
 				9191EC1A21E78731002BAC48 /* Info.plist */,
 			);
 			path = MoveKinTests;
+			sourceTree = "<group>";
+		};
+		9191EC5A21E78AEF002BAC48 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9191EC5B21E78AEF002BAC48 /* StellarKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -205,6 +226,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91D4908B21EB77A5003DD7A2 /* MoveKin.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,10 +246,12 @@
 			files = (
 				9191EC2D21E7874F002BAC48 /* ProvideAddressFlow.swift in Sources */,
 				9191EC3321E7874F002BAC48 /* MoveKinApp.swift in Sources */,
+				91D4908D21EB78DE003DD7A2 /* Bundle+Extensions.swift in Sources */,
 				9191EC2F21E7874F002BAC48 /* MoveKinNavigationController.swift in Sources */,
 				9191EC2E21E7874F002BAC48 /* GetAddressFlow.swift in Sources */,
 				9191EC3021E7874F002BAC48 /* MoveKinConstants.swift in Sources */,
 				9191EC3421E7874F002BAC48 /* MoveKinFlow.swift in Sources */,
+				91D4908921EB7763003DD7A2 /* AcceptMoveKinViewController.swift in Sources */,
 				9191EC3121E7874F002BAC48 /* LaunchURLBuilder.swift in Sources */,
 				9191EC3521E7874F002BAC48 /* PublicKey.swift in Sources */,
 				9191EC3221E7874F002BAC48 /* GetAddressFlowTypes.swift in Sources */,
@@ -386,8 +410,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = MoveKin/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -413,8 +439,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = MoveKin/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

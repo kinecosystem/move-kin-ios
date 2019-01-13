@@ -15,6 +15,11 @@ internal struct Constants {
 
     static let receiveAddressURLPath = "/receive-address"
     static let receiveAddressQueryItem = "address"
+    static let receiveAddressStatusQueryItem = "status"
+    static let receiveAddressStatusOk = "ok"
+    static let receiveAddressStatusCancelled = "cancelled"
+    static let receiveAddressStatusNoAccount = "no-account"
+    static let receiveAddressStatusInvalid = "invalid-params"
 
     static let didBecomeActiveTimeout: TimeInterval = 1
 }
