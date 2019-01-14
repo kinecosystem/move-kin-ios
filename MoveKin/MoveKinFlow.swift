@@ -70,7 +70,9 @@ public class MoveKinFlow {
         return viewController
     }
 
-    public func startMoveKinFlow(to destinationApp: MoveKinApp, amountOption: MoveKinAmountOption) {
+    public func startMoveKinFlow(to destinationApp: MoveKinApp,
+                                 amountOption: MoveKinAmountOption,
+                                 navigationBarImage: UIImage? = nil) {
         guard let uiProvider = uiProvider else {
             fatalError("MoveKin flow started, but no uiProvider set: MoveKinFlow.shared.uiProvider = yourDelegate")
         }
@@ -85,6 +87,7 @@ public class MoveKinFlow {
         let connectingViewController = uiProvider.viewControllerForConnectingStage(destinationApp)
         navigationController = MoveKinNavigationController(rootViewController: connectingViewController)
         navigationController!.setNavigationBarHidden(true, animated: false)
+        navigationController!.navigationBar.setBackgroundImage(navigationBarImage, for: .default)
         presenter?.present(navigationController!, animated: true) { [weak self] in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6, execute: {
                 self?.connectingAppsDidPresent(to: destinationApp)
