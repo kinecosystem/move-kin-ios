@@ -139,6 +139,10 @@ class GetAddressFlow {
     }
 
     @objc func appDidBecomeActive() {
+        guard case GetAddressFlowTypes.State.waitingForAddress = state else {
+            return
+        }
+
         let item = DispatchWorkItem {
             self.state = .error(.timeout)
         }
