@@ -38,7 +38,7 @@ public protocol MoveKinFlowUIProvider: class {
 }
 
 public protocol MoveKinFlowDelegate: class {
-    func sendKin(amount: UInt, to address: String, completion: @escaping (Bool) -> Void)
+    func sendKin(amount: UInt, to address: String, app: MoveKinApp, completion: @escaping (Bool) -> Void)
     func provideUserAddress(addressHandler: @escaping (String?) -> Void)
 }
 
@@ -113,20 +113,12 @@ public class MoveKinFlow {
         let sendingViewController = uiProvider.viewControllerForSendingStage(amount: amount, app: app)
         navigationController!.pushViewController(sendingViewController, animated: true)
         sendingViewController.sendKinDidStart(amount: amount)
-        delegate.sendKin(amount: amount, to: destinationAddress.asString) { success in
+        delegate.sendKin(amount: amount, to: destinationAddress.asString, app: app) { success in
             DispatchQueue.main.async {
                 self.destinationAddress = nil
                 self.amountOption = nil
 
-                if success {
-                    sendingViewController.sendKinDidSucceed(amount: amount) {
-                        let sentViewController = uiProvider.viewControllerForSentStage(amount: amount, app: app)
-                        sentViewController.setupSentKinPage(amount: amount, finishHandler: {
-                            self.finishFlow()
-                        })
-                        self.navigationController!.pushViewController(sentViewController, animated: true)
-                    }
-                } else {
+                guard success else {
                     sendingViewController.sendKinDidFail {
                         let errorPageViewController = uiProvider.errorViewController()
                         errorPageViewController.setupMoveKinErrorPage {
@@ -134,6 +126,16 @@ public class MoveKinFlow {
                         }
                         self.navigationController!.pushViewController(errorPageViewController, animated: true)
                     }
+
+                    return
+                }
+
+                sendingViewController.sendKinDidSucceed(amount: amount) {
+                    let sentViewController = uiProvider.viewControllerForSentStage(amount: amount, app: app)
+                    sentViewController.setupSentKinPage(amount: amount, finishHandler: {
+                        self.finishFlow()
+                    })
+                    self.navigationController!.pushViewController(sentViewController, animated: true)
                 }
             }
         }
