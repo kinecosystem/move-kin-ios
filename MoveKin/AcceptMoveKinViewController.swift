@@ -78,7 +78,8 @@ class AcceptMoveKinViewController: UIViewController {
         super.viewDidLoad()
 
         title = "Kin Ecosystem"
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel",
+        let closeImage = UIImage(named: "CloseButton", in: thisBundle, compatibleWith: nil)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: closeImage,
                                                            style: .plain,
                                                            target: self,
                                                            action: #selector(cancel))
