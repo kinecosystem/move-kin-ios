@@ -8,7 +8,7 @@
 import UIKit
 
 public protocol MoveKinSelectAmountPage: class {
-    func setupSelectAmountPage(selectionHandler: @escaping (UInt) -> Void)
+    func setupSelectAmountPage(cancelHandler: @escaping () -> Void, selectionHandler: @escaping (UInt) -> Void)
 }
 
 public enum MoveKinAmountOption {
@@ -72,7 +72,7 @@ public class MoveKinFlow {
 
     public func startMoveKinFlow(to destinationApp: MoveKinApp, amountOption: MoveKinAmountOption) {
         guard let uiProvider = uiProvider else {
-            fatalError("MoveKin flow started, but no uiProvider set: MoveKinFlow.shared.uiProvider = x")
+            fatalError("MoveKin flow started, but no uiProvider set: MoveKinFlow.shared.uiProvider = yourDelegate")
         }
 
         guard getAddressFlow.state == .idle else {
@@ -119,8 +119,7 @@ public class MoveKinFlow {
                     sendingViewController.sendKinDidSucceed(amount: amount) {
                         let sentViewController = uiProvider.viewControllerForSentStage(amount: amount, app: app)
                         sentViewController.setupSentKinPage(amount: amount, finishHandler: {
-                            self.navigationController!.dismiss(animated: true)
-                            self.navigationController = nil
+                            self.finishFlow()
                         })
                         self.navigationController!.pushViewController(sentViewController, animated: true)
                     }
@@ -128,8 +127,7 @@ public class MoveKinFlow {
                     sendingViewController.sendKinDidFail {
                         let errorPageViewController = uiProvider.errorViewController()
                         errorPageViewController.setupMoveKinErrorPage {
-                            self.navigationController!.dismiss(animated: true)
-                            self.navigationController = nil
+                            self.finishFlow()
                         }
                         self.navigationController!.pushViewController(errorPageViewController, animated: true)
                     }
@@ -144,7 +142,7 @@ public class MoveKinFlow {
             case .success(let publicAddress):
                 self.getAddressFlowDidSucceed(with: publicAddress)
             case .cancelled:
-                self.navigationController?.dismiss(animated: true, completion: nil)
+                self.finishFlow()
             case .error(let error):
                 self.getAddressFlowDidFail(error)
             }
@@ -178,6 +176,11 @@ public class MoveKinFlow {
             break
         }
     }
+
+    fileprivate func finishFlow() {
+        navigationController?.dismiss(animated: true)
+        navigationController = nil
+    }
 }
 
 // MARK: - Success Handling
@@ -192,9 +195,11 @@ fileprivate extension MoveKinFlow {
             case .specified(let amount):
                 self.amountSelected(amount)
             case .willInput(let inputViewController):
-                inputViewController.setupSelectAmountPage { [weak self] amount in
+                inputViewController.setupSelectAmountPage(cancelHandler: { [weak self] in
+                    self?.finishFlow()
+                }, selectionHandler: { [weak self] amount in
                     self?.amountSelected(amount)
-                }
+                })
 
                 self.navigationController!.pushViewController(inputViewController, animated: true)
             }
@@ -207,7 +212,7 @@ extension MoveKinFlow {
     func getAddressFlowDidFail(_ error: GetAddressFlowTypes.Error) {
         switch error {
         case .timeout:
-            navigationController?.dismiss(animated: true, completion: nil)
+            finishFlow()
         case .appLaunchFailed(let app):
             handleOpenAppStore(for: app)
         case .noAccount:
@@ -223,14 +228,14 @@ extension MoveKinFlow {
                                                 message: message,
                                                 preferredStyle: .alert)
         alertController.addAction(.init(title: "Back", style: .default) { _ in
-            self.navigationController?.dismiss(animated: true)
+            self.finishFlow()
         })
         navigationController?.present(alertController, animated: true)
     }
 
     private func getAddressFlowNoAccount() {
         //TODO: add alert
-        navigationController?.dismiss(animated: true)
+        finishFlow()
     }
 
     private func handleOpenAppStore(for destinationApp: MoveKinApp) {
