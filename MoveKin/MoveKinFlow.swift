@@ -44,6 +44,7 @@ public protocol MoveKinFlowDelegate: class {
 
 public class MoveKinFlow {
     public static let shared = MoveKinFlow()
+    var isHapticFeedbackEnabled = true
 
     fileprivate var destinationAddress: PublicAddress?
     fileprivate var amountOption: MoveKinAmountOption?
@@ -120,6 +121,12 @@ public class MoveKinFlow {
 
                 guard success else {
                     sendingViewController.sendKinDidFail {
+                        if #available(iOS 10.0, *), self.isHapticFeedbackEnabled {
+                            let feedbackGenerator = UINotificationFeedbackGenerator()
+                            feedbackGenerator.prepare()
+                            feedbackGenerator.notificationOccurred(.error)
+                        }
+
                         let errorPageViewController = uiProvider.errorViewController()
                         errorPageViewController.setupMoveKinErrorPage {
                             self.finishFlow()
@@ -128,6 +135,12 @@ public class MoveKinFlow {
                     }
 
                     return
+                }
+
+                if #available(iOS 10.0, *), self.isHapticFeedbackEnabled {
+                    let feedbackGenerator = UINotificationFeedbackGenerator()
+                    feedbackGenerator.prepare()
+                    feedbackGenerator.notificationOccurred(.success)
                 }
 
                 sendingViewController.sendKinDidSucceed(amount: amount) {
