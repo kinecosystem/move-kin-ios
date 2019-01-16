@@ -7,44 +7,9 @@
 
 import UIKit
 
-public protocol MoveKinSelectAmountPage: class {
-    func setupSelectAmountPage(cancelHandler: @escaping () -> Void, selectionHandler: @escaping (UInt) -> Void)
-}
-
-public enum MoveKinAmountOption {
-    case specified(UInt)
-    case willInput(UIViewController & MoveKinSelectAmountPage)
-}
-
-public protocol MoveKinSendingPage {
-    func sendKinDidStart(amount: UInt)
-    func sendKinDidSucceed(amount: UInt, moveToSentPage: @escaping () -> Void)
-    func sendKinDidFail(moveToErrorPage: @escaping () -> Void)
-}
-
-public protocol MoveKinSentPage {
-    func setupSentKinPage(amount: UInt, finishHandler: @escaping () -> Void)
-}
-
-public protocol MoveKinErrorPage {
-    func setupMoveKinErrorPage(finishHandler: @escaping () -> Void)
-}
-
-public protocol MoveKinFlowUIProvider: class {
-    func viewControllerForConnectingStage(_ app: MoveKinApp) -> UIViewController
-    func viewControllerForSendingStage(amount: UInt, app: MoveKinApp) -> UIViewController & MoveKinSendingPage
-    func viewControllerForSentStage(amount: UInt, app: MoveKinApp) -> UIViewController & MoveKinSentPage
-    func errorViewController() -> UIViewController & MoveKinErrorPage
-}
-
-public protocol MoveKinFlowDelegate: class {
-    func sendKin(amount: UInt, to address: String, app: MoveKinApp, completion: @escaping (Bool) -> Void)
-    func provideUserAddress(addressHandler: @escaping (String?) -> Void)
-}
-
 public class MoveKinFlow {
     public static let shared = MoveKinFlow()
-    var isHapticFeedbackEnabled = true
+    public var isHapticFeedbackEnabled = true
 
     fileprivate var destinationAddress: PublicAddress?
     fileprivate var amountOption: MoveKinAmountOption?
@@ -116,42 +81,56 @@ public class MoveKinFlow {
         sendingViewController.sendKinDidStart(amount: amount)
         delegate.sendKin(amount: amount, to: destinationAddress.asString, app: app) { success in
             DispatchQueue.main.async {
-                self.destinationAddress = nil
-                self.amountOption = nil
-
                 guard success else {
-                    sendingViewController.sendKinDidFail {
-                        if #available(iOS 10.0, *), self.isHapticFeedbackEnabled {
-                            let feedbackGenerator = UINotificationFeedbackGenerator()
-                            feedbackGenerator.prepare()
-                            feedbackGenerator.notificationOccurred(.error)
-                        }
-
-                        let errorPageViewController = uiProvider.errorViewController()
-                        errorPageViewController.setupMoveKinErrorPage {
-                            self.finishFlow()
-                        }
-                        self.navigationController!.pushViewController(errorPageViewController, animated: true)
-                    }
+                    sendingViewController.sendKinDidFail(moveToErrorPage: { [weak self] in
+                        self?.sendKinDidFail()
+                    })
 
                     return
                 }
 
-                if #available(iOS 10.0, *), self.isHapticFeedbackEnabled {
-                    let feedbackGenerator = UINotificationFeedbackGenerator()
-                    feedbackGenerator.prepare()
-                    feedbackGenerator.notificationOccurred(.success)
-                }
-
-                sendingViewController.sendKinDidSucceed(amount: amount) {
-                    let sentViewController = uiProvider.viewControllerForSentStage(amount: amount, app: app)
-                    sentViewController.setupSentKinPage(amount: amount, finishHandler: {
-                        self.finishFlow()
-                    })
-                    self.navigationController!.pushViewController(sentViewController, animated: true)
+                sendingViewController.sendKinDidSucceed(amount: amount) { [weak self] in
+                    self?.sendKinDidSucceed(amount: amount, app: app)
                 }
             }
         }
+    }
+
+    private func sendKinDidFail() {
+        guard let navController = navigationController, let uiProvider = uiProvider else {
+            return
+        }
+
+        if #available(iOS 10.0, *), self.isHapticFeedbackEnabled {
+            let feedbackGenerator = UINotificationFeedbackGenerator()
+            feedbackGenerator.prepare()
+            feedbackGenerator.notificationOccurred(.error)
+        }
+
+        let errorPageViewController = uiProvider.errorViewController()
+        errorPageViewController.setupMoveKinErrorPage { [weak self] in
+            self?.finishFlow()
+        }
+
+        navController.pushViewController(errorPageViewController, animated: true)
+    }
+
+    private func sendKinDidSucceed(amount: UInt, app: MoveKinApp) {
+        guard let navController = navigationController, let uiProvider = uiProvider else {
+            return
+        }
+
+        if #available(iOS 10.0, *), isHapticFeedbackEnabled {
+            let feedbackGenerator = UINotificationFeedbackGenerator()
+            feedbackGenerator.prepare()
+            feedbackGenerator.notificationOccurred(.success)
+        }
+
+        let sentViewController = uiProvider.viewControllerForSentStage(amount: amount, app: app)
+        sentViewController.setupSentKinPage(amount: amount, finishHandler: { [weak self] in
+            self?.finishFlow()
+        })
+        navController.pushViewController(sentViewController, animated: true)
     }
 
     private func connectingAppsDidPresent(to destinationApp: MoveKinApp) {
@@ -198,6 +177,9 @@ public class MoveKinFlow {
     fileprivate func finishFlow() {
         navigationController?.dismiss(animated: true)
         navigationController = nil
+
+        destinationAddress = nil
+        amountOption = nil
     }
 }
 
@@ -235,7 +217,11 @@ extension MoveKinFlow {
             handleOpenAppStore(for: app)
         case .noAccount:
             getAddressFlowNoAccount()
-        case .bundleIdMismatch, .invalidAddress, .invalidHandleURL, .invalidURLScheme, .invalidLaunchParameters:
+        case.bundleIdMismatch,
+            .invalidAddress,
+            .invalidHandleURL,
+            .invalidURLScheme,
+            .invalidLaunchParameters:
             displayGeneralErrorAlert()
         }
     }
@@ -245,15 +231,14 @@ extension MoveKinFlow {
         let alertController = UIAlertController(title: "Echo… Echo… Echo…",
                                                 message: message,
                                                 preferredStyle: .alert)
-        alertController.addAction(.init(title: "Back", style: .default) { _ in
-            self.finishFlow()
+        alertController.addAction(.init(title: "Back", style: .default) { [weak self] _ in
+            self?.finishFlow()
         })
         navigationController?.present(alertController, animated: true)
     }
 
     private func getAddressFlowNoAccount() {
-        //TODO: add alert
-        finishFlow()
+        displayGeneralErrorAlert()
     }
 
     private func handleOpenAppStore(for destinationApp: MoveKinApp) {

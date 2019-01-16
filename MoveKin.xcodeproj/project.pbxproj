@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9137726821EF1DFB003287FC /* Protocols-Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9137726721EF1DFB003287FC /* Protocols-Enums.swift */; };
 		9191EC1421E78731002BAC48 /* MoveKin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9191EC0A21E78731002BAC48 /* MoveKin.framework */; };
 		9191EC1921E78731002BAC48 /* MoveKinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9191EC1821E78731002BAC48 /* MoveKinTests.swift */; };
 		9191EC1B21E78731002BAC48 /* MoveKin.h in Headers */ = {isa = PBXBuildFile; fileRef = 9191EC0D21E78731002BAC48 /* MoveKin.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9137726721EF1DFB003287FC /* Protocols-Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Protocols-Enums.swift"; sourceTree = "<group>"; };
 		9191EC0A21E78731002BAC48 /* MoveKin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MoveKin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9191EC0D21E78731002BAC48 /* MoveKin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MoveKin.h; sourceTree = "<group>"; };
 		9191EC0E21E78731002BAC48 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 			children = (
 				91D4908A21EB77A5003DD7A2 /* MoveKin.xcassets */,
 				9191EC2B21E7874E002BAC48 /* MoveKinFlow.swift */,
+				9137726721EF1DFB003287FC /* Protocols-Enums.swift */,
 				91D4908C21EB78DE003DD7A2 /* Bundle+Extensions.swift */,
 				9191EC2521E7874E002BAC48 /* GetAddressFlow.swift */,
 				9191EC2421E7874E002BAC48 /* ProvideAddressFlow.swift */,
@@ -247,6 +250,7 @@
 				9191EC2D21E7874F002BAC48 /* ProvideAddressFlow.swift in Sources */,
 				9191EC3321E7874F002BAC48 /* MoveKinApp.swift in Sources */,
 				91D4908D21EB78DE003DD7A2 /* Bundle+Extensions.swift in Sources */,
+				9137726821EF1DFB003287FC /* Protocols-Enums.swift in Sources */,
 				9191EC2F21E7874F002BAC48 /* MoveKinNavigationController.swift in Sources */,
 				9191EC2E21E7874F002BAC48 /* GetAddressFlow.swift in Sources */,
 				9191EC3021E7874F002BAC48 /* MoveKinConstants.swift in Sources */,
