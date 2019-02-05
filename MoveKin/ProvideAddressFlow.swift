@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class ProvideAddressFlow {
     private var presenter: UIViewController? {
@@ -29,7 +30,7 @@ class ProvideAddressFlow {
         return true
     }
 
-    func handleURL(_ url: URL, from appBundleId: String, delegate: MoveKinFlowDelegate?) {
+    func handleURL(_ url: URL, from appBundleId: String, receiveDelegate: MoveKinReceiveDelegate) {
         guard url.host == Constants.urlHost, url.path == Constants.requestAddressURLPath else {
             return
         }
@@ -41,7 +42,6 @@ class ProvideAddressFlow {
         }
 
         guard
-            let delegate = delegate,
             let appName = queryItems.first(where: { $0.name == Constants.callerAppNameQueryItem })?.value,
             let presenter = presenter else {
                 let url = LaunchURLBuilder.provideAddressInvalidURL(urlScheme: appURLScheme)
@@ -54,7 +54,7 @@ class ProvideAddressFlow {
         }
 
         let viewController = AcceptMoveKinViewController()
-        viewController.delegate = delegate
+        viewController.delegate = receiveDelegate
         viewController.appName = appName
         viewController.appURLScheme = appURLScheme
         let navigationController = UINavigationController(rootViewController: viewController)

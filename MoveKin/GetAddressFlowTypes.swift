@@ -7,14 +7,14 @@
 
 import Foundation
 
-struct GetAddressFlowTypes {
-    enum Result {
+public struct GetAddressFlowTypes {
+    public enum Result {
         case success(PublicAddress)
         case cancelled
         case error(Error)
     }
 
-    enum Error: Swift.Error {
+    public enum Error: Swift.Error {
         case invalidURLScheme
         case appLaunchFailed(MoveKinApp)
         case noAccount
@@ -25,7 +25,7 @@ struct GetAddressFlowTypes {
         case timeout
     }
 
-    enum State {
+    public enum State {
         case idle
         case launchingApp
         case waitingForAddress(bundleId: String)

@@ -38,7 +38,10 @@ public protocol MoveKinFlowUIProvider: class {
     func errorViewController() -> UIViewController & MoveKinErrorPage
 }
 
-public protocol MoveKinFlowDelegate: class {
+public protocol MoveKinSendDelegate: class {
     func sendKin(amount: UInt, to address: String, app: MoveKinApp, completion: @escaping (Bool) -> Void)
+}
+
+public protocol MoveKinReceiveDelegate: class {
     func provideUserAddress(addressHandler: @escaping (String?) -> Void)
 }

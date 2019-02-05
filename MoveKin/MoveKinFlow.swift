@@ -8,7 +8,6 @@
 import UIKit
 
 public class MoveKinFlow {
-    public static let shared = MoveKinFlow()
     public var isHapticFeedbackEnabled = true
 
     fileprivate var destinationAddress: PublicAddress?
@@ -18,10 +17,13 @@ public class MoveKinFlow {
     let getAddressFlow = GetAddressFlow()
     let provideAddressFlow = ProvideAddressFlow()
 
-    public weak var delegate: MoveKinFlowDelegate?
+    public weak var sendDelegate: MoveKinSendDelegate?
+    public weak var receiveDelegate: MoveKinReceiveDelegate?
     public weak var uiProvider: MoveKinFlowUIProvider?
 
     private var navigationController: UINavigationController?
+
+    public init() {}
 
     private var presenter: UIViewController? {
         guard let appDelegate = UIApplication.shared.delegate,
@@ -36,11 +38,23 @@ public class MoveKinFlow {
         return viewController
     }
 
+    public func getAddress(for destinationApp: MoveKinApp, completion: @escaping GetAddressFlowCompletion) {
+        guard getAddressFlow.state == .idle else {
+            return
+        }
+
+        getAddressFlow.startMoveKinFlow(to: destinationApp, completion: completion)
+    }
+
     public func startMoveKinFlow(to destinationApp: MoveKinApp,
                                  amountOption: MoveKinAmountOption,
                                  navigationBarImage: UIImage? = nil) {
+        guard sendDelegate != nil else {
+            fatalError("MoveKin flow started, but no sendDelegate was set: moveKinFlow.sendDelegate = yourDelegate")
+        }
+
         guard let uiProvider = uiProvider else {
-            fatalError("MoveKin flow started, but no uiProvider set: MoveKinFlow.shared.uiProvider = yourDelegate")
+            fatalError("MoveKin flow started, but no uiProvider was set: moveKinFlow.uiProvider = yourProvider")
         }
 
         guard getAddressFlow.state == .idle else {
@@ -63,7 +77,7 @@ public class MoveKinFlow {
 
     fileprivate func amountSelected(_ amount: UInt) {
         guard
-            let delegate = delegate,
+            let sendDelegate = sendDelegate,
             let uiProvider = uiProvider else {
             fatalError("MoveKin flow is in progress, but no delegate or uiProvider are set")
         }
@@ -74,12 +88,10 @@ public class MoveKinFlow {
             fatalError("MoveKin flow will start sending, but no destinationAddress or app are set.")
         }
 
-        //TODO: MoveKin look for retain cycles
-
         let sendingViewController = uiProvider.viewControllerForSendingStage(amount: amount, app: app)
         navigationController!.pushViewController(sendingViewController, animated: true)
         sendingViewController.sendKinDidStart(amount: amount)
-        delegate.sendKin(amount: amount, to: destinationAddress.asString, app: app) { success in
+        sendDelegate.sendKin(amount: amount, to: destinationAddress.asString, app: app) { success in
             DispatchQueue.main.async {
                 guard success else {
                     sendingViewController.sendKinDidFail(moveToErrorPage: { [weak self] in
@@ -168,7 +180,17 @@ public class MoveKinFlow {
         case Constants.receiveAddressURLPath:
             getAddressFlow.handleURL(url, from: appBundleId)
         case Constants.requestAddressURLPath:
-            provideAddressFlow.handleURL(url, from: appBundleId, delegate: delegate)
+            guard let receiveDelegate = receiveDelegate else {
+                let message =
+                """
+                MoveKin flow received requestAddressURL (\(Constants.requestAddressURLPath)) but receiveDelegate isn't
+                set: moveKinFlow.receiveDelegate = yourDelegate
+                """
+                print(message)
+                return
+            }
+
+            provideAddressFlow.handleURL(url, from: appBundleId, receiveDelegate: receiveDelegate)
         default:
             break
         }

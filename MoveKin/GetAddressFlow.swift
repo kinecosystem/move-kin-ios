@@ -7,7 +7,7 @@
 
 import UIKit
 
-typealias GetAddressFlowCompletion = (GetAddressFlowTypes.Result) -> Void
+public typealias GetAddressFlowCompletion = (GetAddressFlowTypes.Result) -> Void
 
 class GetAddressFlow {
     private(set) var state = GetAddressFlowTypes.State.idle {

@@ -18,7 +18,7 @@ private func messageText(for sourceApp: String) -> String {
 class AcceptMoveKinViewController: UIViewController {
     var appName: String!
     var appURLScheme: String!
-    weak var delegate: MoveKinFlowDelegate?
+    weak var delegate: MoveKinReceiveDelegate?
 
     let messageLabel: UILabel = {
         let l = UILabel()
