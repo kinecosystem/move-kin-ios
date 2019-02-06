@@ -17,9 +17,10 @@ public class MoveKinFlow {
     let getAddressFlow = GetAddressFlow()
     let provideAddressFlow = ProvideAddressFlow()
 
-    public weak var sendDelegate: MoveKinSendDelegate?
-    public weak var receiveDelegate: MoveKinReceiveDelegate?
-    public weak var uiProvider: MoveKinFlowUIProvider?
+    public weak var sendDelegate: SendKinFlowDelegate?
+    public weak var sendFlowUIProvider: SendKinFlowUIProvider?
+
+    public weak var receiveDelegate: ReceiveKinFlowDelegate?
 
     private var navigationController: UINavigationController?
 
@@ -53,7 +54,7 @@ public class MoveKinFlow {
             fatalError("MoveKin flow started, but no sendDelegate was set: moveKinFlow.sendDelegate = yourDelegate")
         }
 
-        guard let uiProvider = uiProvider else {
+        guard let uiProvider = sendFlowUIProvider else {
             fatalError("MoveKin flow started, but no uiProvider was set: moveKinFlow.uiProvider = yourProvider")
         }
 
@@ -78,7 +79,7 @@ public class MoveKinFlow {
     fileprivate func amountSelected(_ amount: UInt) {
         guard
             let sendDelegate = sendDelegate,
-            let uiProvider = uiProvider else {
+            let uiProvider = sendFlowUIProvider else {
             fatalError("MoveKin flow is in progress, but no delegate or uiProvider are set")
         }
 
@@ -109,7 +110,9 @@ public class MoveKinFlow {
     }
 
     private func sendKinDidFail() {
-        guard let navController = navigationController, let uiProvider = uiProvider else {
+        guard
+            let navController = navigationController,
+            let uiProvider = sendFlowUIProvider else {
             return
         }
 
@@ -128,7 +131,9 @@ public class MoveKinFlow {
     }
 
     private func sendKinDidSucceed(amount: UInt, app: MoveKinApp) {
-        guard let navController = navigationController, let uiProvider = uiProvider else {
+        guard
+            let navController = navigationController,
+            let uiProvider = sendFlowUIProvider else {
             return
         }
 
@@ -180,17 +185,24 @@ public class MoveKinFlow {
         case Constants.receiveAddressURLPath:
             getAddressFlow.handleURL(url, from: appBundleId)
         case Constants.requestAddressURLPath:
-            guard let receiveDelegate = receiveDelegate else {
+            guard let receiveDelegate = receiveDelegate
+                else {
                 let message =
                 """
-                MoveKin flow received requestAddressURL (\(Constants.requestAddressURLPath)) but receiveDelegate isn't
-                set: moveKinFlow.receiveDelegate = yourDelegate
+                MoveKin flow received requestAddressURL (\(Constants.requestAddressURLPath)) but receiveDelegate
+                isn't set:
+
+                moveKinFlow.receiveDelegate = yourDelegate
+                or
+                moveKinFlow.receiveUIProvider = yourUIProvider
                 """
                 print(message)
                 return
             }
 
-            provideAddressFlow.handleURL(url, from: appBundleId, receiveDelegate: receiveDelegate)
+            provideAddressFlow.handleURL(url,
+                                         from: appBundleId,
+                                         receiveDelegate: receiveDelegate)
         default:
             break
         }

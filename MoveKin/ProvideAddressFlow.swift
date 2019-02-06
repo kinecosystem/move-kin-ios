@@ -30,7 +30,9 @@ class ProvideAddressFlow {
         return true
     }
 
-    func handleURL(_ url: URL, from appBundleId: String, receiveDelegate: MoveKinReceiveDelegate) {
+    func handleURL(_ url: URL,
+                   from appBundleId: String,
+                   receiveDelegate: ReceiveKinFlowDelegate) {
         guard url.host == Constants.urlHost, url.path == Constants.requestAddressURLPath else {
             return
         }
@@ -53,11 +55,46 @@ class ProvideAddressFlow {
                 return
         }
 
-        let viewController = AcceptMoveKinViewController()
-        viewController.delegate = receiveDelegate
+        var viewController = receiveDelegate.acceptReceiveKinViewController()
         viewController.appName = appName
-        viewController.appURLScheme = appURLScheme
+        viewController.setupAcceptReceiveKinPage(cancelHandler: {
+            viewController.dismiss(animated: true, completion: nil)
+            ProvideAddressFlow.cancel(urlScheme: appURLScheme)
+        }, acceptHandler: {
+            viewController.dismiss(animated: true, completion: nil)
+            ProvideAddressFlow.accept(delegate: receiveDelegate, urlScheme: appURLScheme)
+        })
+
         let navigationController = UINavigationController(rootViewController: viewController)
         presenter.present(navigationController, animated: true)
+    }
+
+    private static func cancel(urlScheme: String) {
+        let url = LaunchURLBuilder.provideAddressCancelledURL(urlScheme: urlScheme)
+        if #available(iOS 10.0, *) {
+            UIApplication.shared.open(url)
+        } else {
+            UIApplication.shared.openURL(url)
+        }
+    }
+
+    private static func accept(delegate: ReceiveKinFlowDelegate, urlScheme: String) {
+        delegate.provideUserAddress { address in
+            DispatchQueue.main.async {
+                let url: URL
+
+                if let address = address {
+                    url = LaunchURLBuilder.provideAddressURL(address: address, urlScheme: urlScheme)
+                } else {
+                    url = LaunchURLBuilder.provideAddressNoAccount(urlScheme: urlScheme)
+                }
+
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(url)
+                } else {
+                    UIApplication.shared.openURL(url)
+                }
+            }
+        }
     }
 }

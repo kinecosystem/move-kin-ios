@@ -36,7 +36,7 @@ public struct GetAddressFlowTypes {
 }
 
 extension GetAddressFlowTypes.Error: Equatable {
-    static func == (lhs: GetAddressFlowTypes.Error, rhs: GetAddressFlowTypes.Error) -> Bool {
+    public static func == (lhs: GetAddressFlowTypes.Error, rhs: GetAddressFlowTypes.Error) -> Bool {
         switch (lhs, rhs) {
         case (.invalidURLScheme, .invalidURLScheme),
              (.bundleIdMismatch, .bundleIdMismatch),
@@ -53,7 +53,7 @@ extension GetAddressFlowTypes.Error: Equatable {
 }
 
 extension GetAddressFlowTypes.State: Equatable {
-    static func == (lhs: GetAddressFlowTypes.State, rhs: GetAddressFlowTypes.State) -> Bool {
+    public static func == (lhs: GetAddressFlowTypes.State, rhs: GetAddressFlowTypes.State) -> Bool {
         switch (lhs, rhs) {
         case (.idle, .idle), (.launchingApp, .launchingApp), (.cancelled, .cancelled): return true
         case (.success(let la), .success(let ra)): return ra.asString == la.asString

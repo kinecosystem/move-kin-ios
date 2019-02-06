@@ -31,17 +31,23 @@ public protocol MoveKinErrorPage {
     func setupMoveKinErrorPage(finishHandler: @escaping () -> Void)
 }
 
-public protocol MoveKinFlowUIProvider: class {
+public protocol AcceptReceiveKinPage {
+    var appName: String { get set }
+    func setupAcceptReceiveKinPage(cancelHandler: @escaping () -> Void, acceptHandler: @escaping () -> Void)
+}
+
+public protocol SendKinFlowUIProvider: class {
     func viewControllerForConnectingStage(_ app: MoveKinApp) -> UIViewController
     func viewControllerForSendingStage(amount: UInt, app: MoveKinApp) -> UIViewController & MoveKinSendingPage
     func viewControllerForSentStage(amount: UInt, app: MoveKinApp) -> UIViewController & MoveKinSentPage
     func errorViewController() -> UIViewController & MoveKinErrorPage
 }
 
-public protocol MoveKinSendDelegate: class {
+public protocol SendKinFlowDelegate: class {
     func sendKin(amount: UInt, to address: String, app: MoveKinApp, completion: @escaping (Bool) -> Void)
 }
 
-public protocol MoveKinReceiveDelegate: class {
+public protocol ReceiveKinFlowDelegate: class {
+    func acceptReceiveKinViewController() -> UIViewController & AcceptReceiveKinPage
     func provideUserAddress(addressHandler: @escaping (String?) -> Void)
 }
