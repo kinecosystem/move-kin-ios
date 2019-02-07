@@ -8,7 +8,7 @@
 import StellarKit
 
 public struct PublicAddress {
-    let key: Data
+    let key: [UInt8]
 }
 
 extension PublicAddress {
